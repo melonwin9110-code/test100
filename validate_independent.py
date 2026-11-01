@@ -97,7 +97,7 @@ if __name__=='__main__':
     root=Path(__file__).resolve().parent
     report={
         'large':audit(root/'original','overgrown_sanctuary',129,88,129,67,7,18,111,9,(84,3)),
-        'compact':audit(root/'compact','overgrown_sanctuary_60x88x60',60,88,60,31,5,8,54,9,(39,2)),
+        'compact':audit(root/'compact','overgrown_sanctuary_60x88x60',60,88,60,33,5,14,58,7,(41,2)),
         'checks':['gzip CRC and NBT complete parsing','Litematica v6 header and required tags','independent packed-state decoding','Sponge v2 header and VarInt block decoding','all blocks identical across formats','strict six-entry palette','metadata counts','full corridor width and 4-block headroom','single-block stairs and adjacent-step player headroom'],
         'data_version_note':'Both files declare 4671 (Java 1.21.11). No running Minecraft client available.'}
     (root/'audit_report.json').write_text(json.dumps(report,indent=2))

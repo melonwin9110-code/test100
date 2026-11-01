@@ -5,6 +5,7 @@
   },
   {
     "generator": "generate_compact.py",
-    "reproduction_byte_identical": true
+    "reproduction_byte_identical": true,
+    "layout_revision": 2
   }
 ]

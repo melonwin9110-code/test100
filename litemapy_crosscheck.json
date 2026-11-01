@@ -11,6 +11,7 @@
     "litemapy": "0.11.0b0",
     "nbtlib": "2.0.4",
     "all_blocks_match": 316800,
-    "data_version": 4671
+    "data_version": 4671,
+    "layout_revision": 2
   }
 ]

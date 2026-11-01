@@ -1,0 +1,40 @@
+{
+  "compact": {
+    "size": [
+      60,
+      88,
+      60
+    ],
+    "non_air_blocks": 49730,
+    "counts": {
+      "minecraft:air": 267070,
+      "minecraft:smooth_basalt": 22126,
+      "minecraft:stone": 16900,
+      "minecraft:calcite": 21,
+      "minecraft:warped_hyphae": 7806,
+      "minecraft:moss_block": 2877
+    },
+    "highest_occupied_y": 62,
+    "clear_route_width": 5,
+    "clear_route_height": 4,
+    "clear_route_length": 45,
+    "all_checks_passed": true,
+    "in_game_tested": false,
+    "sha256": {
+      "overgrown_sanctuary_60x88x60.litematic": "692833072cba920b14f55a4ae8d704cc3504f592d5ce13c1e288e8af8279a705",
+      "overgrown_sanctuary_60x88x60.schem": "9f437939fd389e6ccbfa876c34cbf0ab66a738bc78976129936c3e077fe042e7"
+    }
+  },
+  "checks": [
+    "gzip CRC and NBT complete parsing",
+    "Litematica v6 header and required tags",
+    "independent packed-state decoding",
+    "Sponge v2 header and VarInt block decoding",
+    "all blocks identical across formats",
+    "strict six-entry palette",
+    "metadata counts",
+    "full corridor width and 4-block headroom",
+    "single-block stairs and adjacent-step player headroom"
+  ],
+  "data_version_note": "Files declare 4671 (Java 1.21.11). No running Minecraft client available."
+}

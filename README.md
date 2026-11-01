@@ -2,22 +2,24 @@
 
 Готовые схематики для Litematica и WorldEdit: высокие разрушенные арки, отдельные обломанные колонны, ступенчатый склон слева, лес, дорожки и широкая лестница перед входом. Это интерпретация композиции референса с ограниченной палитрой.
 
+**Компактная версия 2 построена заново по референсу.** У неё массивные нижние опоры и обрамление входа, сломанная верхняя стена с узкими окнами, неровные мшистые свесы, каменные борозды на склоне и более плотный лес. Сжатие исходной схематики больше не используется. Ранняя версия 129 × 88 × 129 сохранена отдельно; она не была переработана.
+
 ## Скачать
 
 Нажмите на нужный файл ниже. Если браузер показывает страницу файла, нажмите **Download raw file** (значок скачивания). Можно также скачать весь репозиторий через **Code → Download ZIP**.
 
 | Версия | Размер выделения (X × Y × Z) | Litematica | WorldEdit | Комплект ZIP |
 | --- | --- | --- | --- | --- |
-| Компактная | **60 × 88 × 60** | [Скачать .litematic](https://github.com/melonwin9110-code/test100/raw/refs/heads/main/compact/overgrown_sanctuary_60x88x60.litematic) | [Скачать .schem](https://github.com/melonwin9110-code/test100/raw/refs/heads/main/compact/overgrown_sanctuary_60x88x60.schem) | [Скачать комплект](https://github.com/melonwin9110-code/test100/raw/refs/heads/main/compact/compact_60x88x60.zip) |
-| Исходная | 129 × 88 × 129 | [Скачать .litematic](https://github.com/melonwin9110-code/test100/raw/refs/heads/main/original/overgrown_sanctuary.litematic) | [Скачать .schem](https://github.com/melonwin9110-code/test100/raw/refs/heads/main/original/overgrown_sanctuary.schem) | [Скачать комплект](https://github.com/melonwin9110-code/test100/raw/refs/heads/main/original/overgrown_sanctuary_bundle.zip) |
+| Компактная v2 | **60 × 88 × 60** | [Скачать .litematic](https://github.com/melonwin9110-code/test100/raw/refs/heads/main/compact/overgrown_sanctuary_60x88x60.litematic) | [Скачать .schem](https://github.com/melonwin9110-code/test100/raw/refs/heads/main/compact/overgrown_sanctuary_60x88x60.schem) | [Скачать комплект](https://github.com/melonwin9110-code/test100/raw/refs/heads/main/compact/compact_60x88x60.zip) |
+| Ранняя большая версия | 129 × 88 × 129 | [Скачать .litematic](https://github.com/melonwin9110-code/test100/raw/refs/heads/main/original/overgrown_sanctuary.litematic) | [Скачать .schem](https://github.com/melonwin9110-code/test100/raw/refs/heads/main/original/overgrown_sanctuary.schem) | [Скачать комплект](https://github.com/melonwin9110-code/test100/raw/refs/heads/main/original/overgrown_sanctuary_bundle.zip) |
 
-Компактная версия содержит **46 027 непустых блоков**, исходная — **212 497**. Размеры включают основание ландшафта и воздушный запас сверху; высота 88 — размер выделения. Передняя сторона — **+Z**, склон — **−X**. Деревья сделаны целиком из искажённого дерева.
+Компактная версия содержит **49 730 непустых блоков**, исходная — **212 497**. Размеры включают основание ландшафта и воздушный запас сверху; высота 88 — размер выделения. Верхний занятый слой компактной версии — **Y=62**. Передняя сторона — **+Z**, склон — **−X**. Деревья сделаны целиком из искажённого дерева.
 
 ## Компактная версия: техническое превью
 
 ![Геометрия компактных руин](compact/preview.png)
 
-Это технический рендер блоков, без игровых текстур и шейдеров. [Превью исходной версии](original/preview.png).
+Это технический рендер блоков, без игровых текстур и шейдеров. [Другой ракурс компактной версии](compact/preview_isometric.png). [Превью ранней большой версии](original/preview.png).
 
 ## Установка
 

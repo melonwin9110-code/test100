@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Standalone Python 3 generator; standard library only. Run in an empty output directory."""
+"""Reference-led compact ruined sanctuary. Python 3 standard library only."""
 import gzip, struct, math, random, json, collections
 from pathlib import Path
 
-W,H,D=129,88,129
-PALETTE=['minecraft:air','minecraft:smooth_basalt','minecraft:stone','minecraft:calcite','minecraft:warped_hyphae','minecraft:moss_block']
+W,H,D=60,88,60
 DATA_VERSION=4671
-rng=random.Random(9110)
+PALETTE=['minecraft:air','minecraft:smooth_basalt','minecraft:stone','minecraft:calcite','minecraft:warped_hyphae','minecraft:moss_block']
 blocks=bytearray(W*H*D)
+rng=random.Random(911002)
 def idx(x,y,z): return (y*D+z)*W+x
 def put(x,y,z,b):
     if 0<=x<W and 0<=y<H and 0<=z<D: blocks[idx(x,y,z)]=b
@@ -17,179 +17,268 @@ def box(x0,y0,z0,x1,y1,z1,b):
     for y in range(y0,y1+1):
         for z in range(z0,z1+1):
             for x in range(x0,x1+1): put(x,y,z,b(x,y,z) if callable(b) else b)
+def hashed(x,z,seed=0):
+    n=(x*374761393+z*668265263+seed*1274126177)&0xffffffff
+    n=((n^(n>>13))*1274126177)&0xffffffff
+    return ((n^(n>>16))&0xffff)/65535
+def noise(x,z,seed=0):
+    ix,iz=math.floor(x),math.floor(z); fx,fz=x-ix,z-iz
+    fx=fx*fx*(3-2*fx); fz=fz*fz*(3-2*fz)
+    return ((1-fx)*hashed(ix,iz,seed)+fx*hashed(ix+1,iz,seed))*(1-fz)+((1-fx)*hashed(ix,iz+1,seed)+fx*hashed(ix+1,iz+1,seed))*fz
 def rock(x,y,z):
-    n=rng.random()
-    return 3 if n<.028 else 2 if n<.37 else 1
+    # Large coherent dark/light patches, rather than block-by-block white speckle.
+    n=noise(x*.24+y*.08,z*.24-y*.12,5)
+    return 2 if n>.64 else 1
+
 ground={}
-# Broad mossy forest floor, with a steep terraced massif on the left.
+# Rugged hill belongs to the left BACKGROUND. It rolls down in both directions.
 for z in range(D):
     for x in range(W):
-        h=3+int(1.3*math.sin(x*.09)+1.1*math.sin(z*.075))
-        if x<40:
-            hill=max(0, (39-x)*1.14 - max(0,z-48)*.25 + 3*math.sin(z*.045))
-            h=max(h,3+int(hill//2)*2)
+        low=3+int(noise(x*.10,z*.10,1)*2)
+        hill=45*max(0,1-x/24)**1.25*math.exp(-((z-7)/30)**2)
+        hill+=max(0,1-x/24)*6*(noise(x*.22,z*.17,2)-.5)
+        if 4<z<39:
+            hill-=max(0,1-abs(x-(7+2*math.sin(z*.20)))/2.5)*(4+5*noise(x*.2,z*.2,72))
+        if 12<z<43:
+            hill-=max(0,1-abs(x-(15+2*math.sin(z*.16)))/2)*5
+        h=max(low,3+2*int(max(0,hill)/2))
         ground[x,z]=h
-        for y in range(h+1): put(x,y,z,5 if y==h else (1 if y<h-3 else 2))
-# Raised sanctuary and a level path corridor to the rear.
-for z in range(32,90):
-    for x in range(39,96):
-        if ((x-67)/30)**2+((z-61)/34)**2<1.05:
-            box(x,0,z,x,9,z,2)
-            put(x,9,z,5 if rng.random()<.32 else rock(x,9,z))
-for z in range(17,111):
-    for x in range(61,74):
-        top=9 if z<=84 else max(3,9-(z-84)//3)
+        for y in range(h+1):
+            b=1 if y<h-3 else 2
+            if y==h:
+                threshold=.43 if h>10 else .28
+                b=5 if noise(x*.32,z*.27,3)>threshold else rock(x,y,z)
+                if h>9 and abs(x-(7+2*math.sin(z*.20)))<1.6: b=1
+            put(x,y,z,b)
+        # Cliff ledges occasionally project beyond a terrace line.
+        if x<21 and h>10 and hashed(x,z,7)>.91:
+            put(x,h+1,z,1 if hashed(x,z,8)>.4 else 5)
+
+# A low irregular podium; visible retaining courses follow the sanctuary footprint.
+for z in range(15,43):
+    for x in range(18,48):
+        if ((x-33)/16)**2+((z-29)/16)**2<1.12:
+            box(x,0,z,x,7,z,2)
+            put(x,7,z,5 if noise(x*.3,z*.3,10)>.62 else rock(x,7,z))
+for z in (16,40):
+    for x in range(23,44):
+        if get(x,7,z): put(x,7,z,1)
+
+# Broad flared stair: five 2-block-deep full-block treads.
+for z in range(41,51):
+    top=max(3,7-(z-41)//2)
+    half=9+(z-41)//4
+    for x in range(33-half,34+half):
+        if abs(x-33)>half-2 and hashed(x,z,11)>.76: continue
         box(x,0,z,x,top,z,2)
-        put(x,top,z,1 if rng.random()<.3 else 2)
-# Broad six-step entrance stair: 3-block treads, full blocks only.
-for z in range(85,103):
-    top=9-(z-85)//3
-    half=15+(z-85)//6
-    for x in range(67-half,68+half):
-        box(x,0,z,x,top,z,2)
-        put(x,top,z,1 if rng.random()<.65 else 2)
-# Winding secondary paths, including a right-hand forest loop.
-for z in range(10,122):
-    cx=103+int(8*math.sin(z*.055))
-    for x in range(cx-3,cx+4):
-        h=ground[x,z]
-        put(x,h,z,2 if rng.random()<.8 else 1)
-for x in range(47,112):
-    zc=110+int(3*math.sin(x*.09))
-    for z in range(zc-3,zc+4):
-        h=ground[x,z]; put(x,h,z,2)
+        put(x,top,z,1 if z%2==0 or abs(x-33)>half-2 else 2)
 
-def pillar(cx,cz,top,base=10,radius=2):
-    box(cx-radius-1,base,cz-radius-1,cx+radius+1,base+2,cz+radius+1,rock)
-    for y in range(base+3,top+1):
-        rad=radius+1 if (y-base)%12 in (0,1) else radius
-        for z in range(cz-rad,cz+rad+1):
-            for x in range(cx-rad,cx+rad+1):
-                # Chamfered corners and fluted faces.
-                if abs(x-cx)==rad and abs(z-cz)==rad: continue
-                if y>top-4 and ((x*19+z*7)%5 < y-(top-4)): continue
-                put(x,y,z,rock(x,y,z))
-    # Broken crowning fragments, individually supported.
-    box(cx-1,top+1,cz-1,cx,top+2,cz,rock)
+def path(points,width=2):
+    for a,b in zip(points,points[1:]):
+        n=max(abs(a[i]-b[i]) for i in (0,1))*3
+        for j in range(n+1):
+            x=round(a[0]+(b[0]-a[0])*j/max(1,n)); z=round(a[1]+(b[1]-a[1])*j/max(1,n))
+            for dx in range(-width,width+1):
+                for dz in range(-width,width+1):
+                    if dx*dx+dz*dz>(width+.4)**2: continue
+                    xx,zz=x+dx,z+dz
+                    if not (0<=xx<W and 0<=zz<D): continue
+                    y=ground[xx,zz]
+                    if y>9 or (18<=xx<=47 and 15<=zz<=41): continue
+                    put(xx,y,zz,1 if max(abs(dx),abs(dz))==width and hashed(xx,zz,14)>.4 else 2)
+path([(32,59),(34,54),(33,50)],3)
+path([(26,57),(41,55),(52,48),(54,36),(52,23),(48,11)],2)
+path([(12,53),(20,49),(25,47)],2)
 
-def arch(cx,cz,span,spring,rise,thickness=3,broken=False,axis='x'):
-    # Rounded Gothic arch, built with 4-block-deep stone ribs.
-    for u in range(-span,span+1):
-        t=abs(u)/span
-        outer=spring+round(rise*(1-t**1.5)**.65)
-        for y in range(outer-thickness+1,outer+1):
-            for dep in range(-2,3):
-                if broken and u>2 and y>spring+rise-7: continue
-                if broken and u>span-4 and y>outer-1: continue
-                x,z=(cx+u,cz+dep) if axis=='x' else (cx+dep,cz+u)
+def pier(cx,cz,base,top,rx=2,rz=2,broken=False):
+    for y in range(base,top+1):
+        foot=y<=base+2
+        band=y in (base+3,base+13,top-2,top-1)
+        ax=rx+1 if foot or band else rx
+        az=rz+1 if foot or band else rz
+        for z in range(cz-az,cz+az+1):
+            for x in range(cx-ax,cx+ax+1):
+                if abs(x-cx)==ax and abs(z-cz)==az: continue
+                cap=top-int(hashed(x,z,20)*5) if broken else top
+                if y>cap: continue
+                put(x,y,z,rock(x,y,z))
+    if broken:
+        box(cx-1,top,cz-1,cx,top+2,cz,rock)
+    # Restrained bright chips, only on a handful of fractured edges.
+    if top-base>20:
+        for y in (base+4,base+5,top-4): put(cx-rx,y,cz+rz,3)
+
+def arch_x(cx,cz,span,spring,rise,inner_span,inner_rise,depth=5,broken_side=False):
+    # Solid spandrels surrounding a carved rounded opening.
+    for x in range(cx-span,cx+span+1):
+        u=x-cx; t=abs(u)/span
+        outer=spring+round(rise*math.sqrt(max(0,1-t*t)))
+        ceiling=spring+round(inner_rise*math.sqrt(max(0,1-(u/inner_span)**2))) if abs(u)<=inner_span else spring-3
+        for y in range(spring-3,outer+1):
+            if abs(u)<=inner_span and y<=ceiling: continue
+            for z in range(cz-depth//2,cz+depth//2+1):
+                if broken_side and u>span-3 and y>outer-2: continue
                 put(x,y,z,rock(x,y,z))
 
-# Two tall portals with surviving longitudinal ribs form an open ruined nave.
-for x,z,top in [(48,76,49),(86,76,47),(48,43,63),(86,43,59)]: pillar(x,z,top)
-arch(67,76,19,44,20,4)
-arch(67,43,19,57,19,4,True)
-arch(48,59,16,46,17,3,False,'z')
-arch(86,59,16,44,15,3,True,'z')
-# Offset upper wall remnants with tall open window slits and a jagged skyline.
-for x in range(46,90):
-    cap=74+int(3*math.sin(x*1.3))+((x//4)%3)*2
-    for y in range(62,cap):
-        if 64<y<73 and x%9 in (2,3,4): continue
-        if x>76 and y>69: continue
-        if 58<x<65 and y>72: continue
-        for z in range(40,43):
-            if get(x,y,z) or y>68 or abs(x-48)<5 or abs(x-86)<5:
-                put(x,y,z,rock(x,y,z))
-# Pedestals and distinct shattered outer pillars, asymmetrical heights.
-for x,z,top in [(32,79,38),(39,99,22),(99,75,43),(110,54,48),(99,35,36),(34,44,30),(91,98,27)]:
-    base=max(ground[x,z]+1,10 if 39<x<96 and 32<z<90 else 5)
-    pillar(x,z,top,base,1 if x==99 and z==35 else 2)
-# Fallen masonry mostly outside the central passage.
-for _ in range(100):
-    x=rng.randrange(31,111); z=rng.randrange(29,104)
-    if 58<=x<=77: continue
-    y=max((yy for yy in range(24) if get(x,yy,z)),default=3)+1
-    if y<19: box(x,y,z,x+rng.randrange(1,4),y+rng.randrange(0,2),z+rng.randrange(1,3),rock)
-# Moss replaces exposed masonry and hangs from the surviving high ribs.
-for y in range(10,80):
-    for z in range(32,84):
-        for x in range(40,94):
+def arch_z(cx,cz,span,spring,rise,inner_span,inner_rise,depth=5,broken=False):
+    for z in range(cz-span,cz+span+1):
+        u=z-cz; outer=spring+round(rise*math.sqrt(max(0,1-(u/span)**2)))
+        ceiling=spring+round(inner_rise*math.sqrt(max(0,1-(u/inner_span)**2))) if abs(u)<=inner_span else spring-3
+        for y in range(spring-3,outer+1):
+            if abs(u)<=inner_span and y<=ceiling: continue
+            if broken and z>cz+1 and y>spring+rise-5: continue
+            for x in range(cx-depth//2,cx+depth//2+1): put(x,y,z,rock(x,y,z))
+
+# Heavy lower sanctuary. Front opening is framed by thick, articulated piers.
+for x,z,top in [(23,36,31),(43,36,31),(23,20,39),(43,20,38)]:
+    pier(x,z,8,top,2,2)
+    # Buttresses split the mass into vertical ribs without decorative extra blocks.
+    box(x-1,10,z+3,x+1,24,z+4,rock)
+    box(x-1,25,z+3,x+1,27,z+3,rock)
+arch_x(33,36,12,30,13,7,7,5)
+arch_x(33,20,12,37,12,7,7,5,True)
+arch_z(23,28,8,31,12,4,6,5)
+arch_z(43,28,8,30,11,4,5,5,True)
+# Horizontal projecting shoulders over the piers carry the moss blanket.
+for x in (23,43):
+    box(x-4,29,33,x+4,30,39,rock)
+    box(x-3,31,33,x+3,32,39,rock)
+
+# Broken upper rear arcade: smaller windows, continuous foot, irregular skyline.
+skyline=[54,56,58,58,57,55,53,54,57,60,61,60,57,56,58,60,59,56,54,53,55,54,52,51,50]
+for x in range(21,46):
+    top=skyline[x-21]
+    for y in range(39,top+1):
+        # Upper window wall grows from a broad lintel, rather than a second giant ring.
+        if x in (25,26,27,31,32,33,37,38,39,43) and 45<=y<=top-2: continue
+        for z in range(18,22):
+            # One diagonal bite cuts away the entire upper-right corner.
+            if x>39 and y>54-(x-39)*2: continue
+            put(x,y,z,rock(x,y,z))
+# An attached, shattered left return wall suggests a second storey in depth.
+for z in range(22,31):
+    top=54-(z-22)//2
+    for y in range(41,top):
+        if z in (24,25,28) and y>45: continue
+        for x in range(21,24): put(x,y,z,rock(x,y,z))
+# An offset surviving inner pier interrupts the rear opening and carries the arcade.
+pier(38,22,8,49,1,1)
+
+# Freestanding ruins: uneven heights, rotations implied by off-centre fragments.
+for x,z,top,rx in [(14,36,32,1),(19,46,18,1),(49,30,38,1),(51,19,42,1),(47,43,29,1),(36,13,27,1)]:
+    pier(x,z,ground[x,z]+1,top,rx,1,True)
+    if top>30:
+        box(x-2,top-4,z,x+1,top-3,z+1,rock)
+        box(x,top+1,z,x+1,top+2,z,rock)
+
+# Fallen masonry is grouped into a few slabs, leaving the principal view open.
+for cx,cz,n in [(19,40,9),(45,41,8),(46,21,7),(23,45,6),(38,14,5),(16,31,5)]:
+    for _ in range(n):
+        x=cx+rng.randrange(-3,4); z=cz+rng.randrange(-3,4)
+        if 28<=x<=38 and z>32: continue
+        y=max((yy for yy in range(15) if get(x,yy,z)),default=3)+1
+        if y>11: continue
+        box(x,y,z,x+rng.randrange(1,3),y+rng.randrange(0,2),z+rng.randrange(1,3),rock)
+
+# Heavy moss grows in connected patches over arch shoulders and broken cornices.
+for y in range(12,63):
+    for z in range(15,41):
+        for x in range(18,48):
             if get(x,y,z) in (1,2) and get(x,y+1,z)==0:
-                patch=math.sin(x*.31+z*.18)+math.sin(z*.39-y*.1)
-                if patch>.6 and rng.random()<.65: put(x,y,z,5)
-for x,z,length in [(52,76,10),(55,75,6),(80,76,8),(48,54,9),(49,59,6),(77,43,7),(85,48,5)]:
-    tops=[y for y in range(38,73) if get(x,y,z)]
+                lush=noise(x*.28,z*.27,30)+.18*math.sin(y*.3)
+                if lush>.49:
+                    put(x,y,z,5)
+                    if y>29 and noise(x*.38,z*.37,31)>.6: put(x,y+1,z,5)
+# Dense, asymmetric overgrowth masks the arch crown, as in the reference.
+for x in range(24,43):
+    for z in range(32,40):
+        tops=[y for y in range(30,47) if get(x,y,z)]
+        if not tops or noise(x*.25,z*.27,32)<.32: continue
+        y=max(tops)
+        put(x,y,z,5)
+        if noise(x*.37,z*.4,33)>.47: put(x,y+1,z,5)
+for cx,cy,cz,rx,ry,rz in [(28,42,36,4,3,4),(39,39,36,4,3,3),(24,35,35,3,3,3)]:
+    for y in range(cy-ry,cy+ry+1):
+        for z in range(cz-rz,cz+rz+1):
+            for x in range(cx-rx,cx+rx+1):
+                d=((x-cx)/rx)**2+((y-cy)/ry)**2+((z-cz)/rz)**2
+                if d<.9+.25*noise(x*.4,z*.4+y*.2,75): put(x,y,z,5)
+for x,z,end in [(29,39,29),(30,39,31),(31,39,33),(36,39,34),(37,39,32)]:
+    tops=[y for y in range(33,46) if get(x,y,z)==5]
     if tops:
-        top=max(tops)
-        for y in range(top-length,top+1): put(x,y,z,5)
+        for y in range(end,max(tops)+1): put(x,y,z,5)
+for x,z,length in [(25,39,9),(26,39,7),(27,39,5),(29,38,5),(38,39,8),(39,39,10),(40,39,6),(23,31,8),(21,28,6),(42,24,7)]:
+    tops=[y for y in range(30,48) if get(x,y,z)]
+    if not tops:
+        # Root each pendant into nearby masonry rather than floating in space.
+        roots=[(abs(xx-x)+abs(zz-z),xx,yy,zz) for xx in range(x-1,x+2) for zz in range(z-1,z+2) for yy in range(34,45) if get(xx,yy,zz)]
+        if not roots: continue
+        _,xx,y,zz=min(roots); put(x,y,z,5)
+    else: y=max(tops)
+    for yy in range(max(24,y-length),y+1):
+        put(x,yy,z,5)
+        if yy>y-length+2 and hashed(yy,x+z,34)>.48: put(x+1,yy,z,5)
 
 def line(a,b,mat=4):
     n=max(abs(b[i]-a[i]) for i in range(3))
     for j in range(n+1):
         p=tuple(round(a[i]+(b[i]-a[i])*j/max(1,n)) for i in range(3)); put(*p,mat)
-def tree(x,z,height):
-    # Entire tree, including broad stepped crown silhouettes, uses warped hyphae.
-    base=max(y for y in range(H) if get(x,y,z))+1
-    if base>28: return
-    for y in range(base,base+height):
-        put(x,y,z,4)
-        if height>15: put(x+1,y,z,4)
-    for k in range(5):
-        angle=k*2.4+rng.random()*.6
-        radius=rng.randrange(3,7)
-        bx=x+round(math.cos(angle)*radius); bz=z+round(math.sin(angle)*radius)
-        by=base+height-3-rng.randrange(0,6)
-        line((x,by-4,z),(bx,by,bz))
-        for dy in range(-1,3):
-            rad=radius//2+2-(max(0,dy))
-            for dz in range(-rad,rad+1):
-                for dx in range(-rad,rad+1):
-                    if abs(dx)+abs(dz)<=rad+1 and rng.random()>.10: put(bx+dx,by+dy,bz+dz,4)
-centers=[]
-for _ in range(600):
-    x=rng.randrange(7,123); z=rng.randrange(7,123)
-    if 38<x<97 and 26<z<107: continue
-    if x<39: continue
-    if abs(x-(103+int(8*math.sin(z*.055))))<7: continue
-    if z>103 and 46<x<116: continue
-    if any((x-a)**2+(z-b)**2<64 for a,b in centers): continue
-    centers.append((x,z)); tree(x,z,rng.randrange(11,24))
-# Smaller silhouette trees on the left foreground and terraces.
-for x,z,h in [(22,108,15),(28,92,12),(20,63,13),(30,31,16),(16,19,15),(45,116,11)]: tree(x,z,h)
-# Keep a continuous, 7-block-wide, 4-block-high walkable route through both portals.
-route=[]
-for z in range(18,112):
-    floor=9 if z<=84 else max(3,9-(z-84)//3)
-    for x in range(64,71):
-        box(x,0,z,x,floor,z,2)
-        box(x,floor+1,z,x,floor+4,z,0)
-    route.append((67,floor+1,z))
+def crown(cx,cy,cz,rad):
+    # Entire crown is warped hyphae, NOT leaves; irregular overlapping layers.
+    for dy in range(-1,3):
+        radius=max(1,rad-(1 if dy==2 else 0))
+        for dz in range(-radius,radius+1):
+            for dx in range(-radius,radius+1):
+                if dx*dx+dz*dz>(radius+.2)**2: continue
+                if abs(dx)+abs(dz)>radius and hashed(cx+dx,cz+dz,cy+dy)>.88: continue
+                x,y,z=cx+dx,cy+dy,cz+dz
+                if get(x,y,z)==0: put(x,y,z,4)
+def tree(x,z,height,rad=3):
+    base=ground[x,z]+1
+    if base>22: return
+    lean=1 if hashed(x,z,41)>.5 else -1
+    line((x,base,z),(x+lean,base+height,z))
+    if height>14: line((x+1,base,z),(x+lean+1,base+height-4,z))
+    for k in range(3):
+        a=k*2.4+hashed(x,z,k)*1.1
+        reach=rad+1
+        bx=x+round(math.cos(a)*reach); bz=z+round(math.sin(a)*reach)
+        by=base+height-3-k*2
+        line((x+lean,by-3,z),(bx,by,bz))
+        crown(bx,by,bz,rad)
+    crown(x+lean,base+height,z,rad)
 
-# Compact edition: preserve vertical silhouette and resample the full footprint.
-original_blocks=blocks
-old_w,old_d=W,D
-W,D=60,60
-blocks=bytearray(W*H*D)
-for y in range(H):
-    for z in range(D):
-        oz=min(old_d-1,int((z+.5)*old_d/D))
-        for x in range(W):
-            ox=min(old_w-1,int((x+.5)*old_w/W))
-            put(x,y,z,original_blocks[(y*old_d+oz)*old_w+ox])
-# Rebuild stair treads after compaction, keeping single-block rises.
-for z in range(40,53):
-    floor=max(3,9-(z-39)//2)
-    for x in range(24,40):
-        box(x,0,z,x,floor,z,2)
-        box(x,floor+1,z,x,13,z,0)
-        put(x,floor,z,1 if rng.random()<.55 else 2)
+# Overlapping low canopy surrounds the shrine; no foreground tree hides the entry.
+trees=[(53,8,14,3),(46,7,16,3),(38,6,12,3),(30,7,13,3),
+       (57,15,13,3),(56,25,15,3),(56,34,12,3),(55,42,15,3),
+       (53,50,12,3),(47,52,13,3),(44,57,10,2),(53,57,11,3),
+       (16,54,12,3),(11,47,13,3),(10,39,13,3),(17,27,11,2),
+       (18,18,12,2),(24,12,12,2),(48,15,10,2),(48,37,9,2),
+       (42,10,10,2),(58,52,12,2),(9,57,11,2),(4,51,10,2)]
+for x,z,height,rad in trees: tree(x,z,height,rad)
+# Low warped-wood undergrowth ties the isolated trunks into a continuous forest.
+for _ in range(200):
+    x=rng.randrange(3,58); z=rng.randrange(4,58)
+    if 18<=x<=47 and 14<=z<=51: continue
+    if z>49 and 20<x<43: continue
+    if x<19 and ground[x,z]>18: continue
+    if not any((x-tx)**2+(z-tz)**2<40 for tx,tz,_,_ in trees): continue
+    y=ground[x,z]+1
+    if get(x,y,z)==0 and hashed(x,z,60)>.4:
+        for dx,dz in [(0,0),(1,0),(-1,0),(0,1),(0,-1)]:
+            if get(x+dx,y,z+dz)==0: put(x+dx,y,z+dz,4)
+        if hashed(x,z,61)>.5: put(x,y+1,z,4)
+
+# Final pedestrian corridor: five-wide, with a four-block clear envelope.
 route=[]
-for z in range(8,55):
-    floor=9 if z<=39 else max(3,9-(z-39)//2)
-    for x in range(29,34):
+for z in range(14,59):
+    floor=7 if z<=42 else max(3,7-(z-41)//2)
+    for x in range(31,36):
         box(x,0,z,x,floor,z,2)
         box(x,floor+1,z,x,floor+4,z,0)
-    route.append((31,floor+1,z))
+        put(x,floor,z,2 if noise(x*.3,z*.3,70)>.3 else 1)
+    route.append((33,floor+1,z))
+
 
 # Minimal complete NBT serializer. Litematica's packed states cross long boundaries.
 def s(v):
@@ -218,7 +307,7 @@ region={'Position':(10,vec(0,0,0)),'Size':(10,vec(W,H,D)),
         'BlockStatePalette':(9,(10,[{'Name':(8,name)} for name in PALETTE])),
         'BlockStates':(12,states),'Entities':(9,(10,[])),'TileEntities':(9,(10,[])),
         'PendingBlockTicks':(9,(10,[])),'PendingFluidTicks':(9,(10,[]))}
-meta={'Name':(8,'Overgrown Broken Sanctuary Compact'),'Author':(8,'OpenAI'),
+meta={'Name':(8,'Overgrown Sanctuary - Reference Rebuild'),'Author':(8,'OpenAI'),
       'Description':(8,'Five-block reference-inspired ruins, terraced left hillside, forest and broad entrance stair.'),
       'RegionCount':(3,1),'TimeCreated':(4,1793577600000),'TimeModified':(4,1793577600000),
       'TotalBlocks':(3,count),'TotalVolume':(3,len(blocks)),'EnclosingSize':(10,vec(W,H,D))}
@@ -229,7 +318,7 @@ schem={'Version':(3,2),'DataVersion':(3,DATA_VERSION),'Width':(2,W),'Height':(2,
        'Offset':(11,[0,0,0]),'PaletteMax':(3,len(PALETTE)),
        'Palette':(10,{name:(3,i) for i,name in enumerate(PALETTE)}),
        'BlockData':(7,blocks),'BlockEntities':(9,(10,[])),'Entities':(9,(10,[])),
-       'Metadata':(10,{'Name':(8,'Overgrown Broken Sanctuary Compact')})}
+       'Metadata':(10,{'Name':(8,'Overgrown Sanctuary - Reference Rebuild')})}
 # Add the two remaining NBT types used by Sponge.
 original_payload=payload
 def payload(t,v):
@@ -279,7 +368,7 @@ for x,y,z in route:
         assert all(get(xx,yy,z)==0 for yy in range(y,y+4))
 for a,b in zip(route,route[1:]): assert abs(a[1]-b[1])<=1
 counts=collections.Counter(blocks)
-report={'dimensions':{'x':W,'y':H,'z':D},'minecraft_data_version':DATA_VERSION,
+report={'dimensions':{'x':W,'y':H,'z':D},'minecraft_data_version':DATA_VERSION,'layout_revision':2,'highest_occupied_y':max(i//(W*D) for i,b in enumerate(blocks) if b),
         'non_air_blocks':count,'palette_counts':{p:counts[i] for i,p in enumerate(PALETTE)},
         'validation':{'gzip_nbt_roundtrip':True,'litematica_all_packed_states_match':True,
                       'worldedit_all_blocks_match':True,'entrance_route_width':5,
