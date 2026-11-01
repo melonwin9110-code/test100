@@ -4,9 +4,9 @@
 
 **[Скачать .litematic](https://github.com/melonwin9110-code/test100/raw/refs/heads/main/uploaded_edit/ancient_ruins_warped_edited.litematic)** · **[Скачать .schem](https://github.com/melonwin9110-code/test100/raw/refs/heads/main/uploaded_edit/ancient_ruins_warped_edited.schem)** · **[Весь комплект ZIP](https://github.com/melonwin9110-code/test100/raw/refs/heads/main/uploaded_edit/ancient_ruins_warped_edited_bundle.zip)**
 
-Размер **55 × 34 × 51**, высота исходника **34 блока сохранена точно**. Все прежние непустые позиции остались на своих местах. Исправлена палитра, немного добавлены мох и обломки; закрыты три дырки в полу. [Подробности и установка](uploaded_edit/README.md).
+Размер **55 × 34 × 51**, высота исходника **34 блока сохранена точно**. В последней правке базальт уменьшен примерно втрое: **2 822 → 941**. Остальные 1 881 блок заменены смесью **941 булыжника и 940 замшелого булыжника**. Все прочие блоки и геометрия сохранены. Предыдущие локальные правки мха, обломков и пола остаются. [Подробности и установка](uploaded_edit/README.md).
 
-![Загруженная схема до и после локальных правок](uploaded_edit/comparison.png)
+![Схема до и после уменьшения базальта](uploaded_edit/comparison.png)
 
 ## Ранее сгенерированные варианты
 

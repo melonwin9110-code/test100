@@ -42,8 +42,10 @@
     "minecraft:moss_block": 377,
     "minecraft:warped_hyphae[axis=y]": 36,
     "minecraft:calcite": 59,
-    "minecraft:smooth_basalt": 2822,
-    "minecraft:warped_hyphae[axis=x]": 24
+    "minecraft:smooth_basalt": 941,
+    "minecraft:warped_hyphae[axis=x]": 24,
+    "minecraft:cobblestone": 941,
+    "minecraft:mossy_cobblestone": 940
   },
   "changes": {
     "cobblestone_to_stone": 2104,
@@ -558,7 +560,15 @@
         0,
         49
       ]
-    ]
+    ],
+    "basalt_replacement": {
+      "baseline_basalt": 2822,
+      "remaining_basalt": 941,
+      "added_cobblestone": 941,
+      "added_mossy_cobblestone": 940,
+      "geometry_unchanged_from_previous_edit": true,
+      "other_block_states_unchanged": true
+    }
   },
   "validation": {
     "same_selection_dimensions": true,
@@ -574,7 +584,7 @@
     "in_game_tested": false
   },
   "sha256": {
-    ".schem": "8ceef751fa095ce5a393ccbbf2cd799387052f1b011e97e92edc7e05ff547a66",
-    ".litematic": "f52c80c51fa6aeebdf34564ccf8391c116f73771c9439ca3c45a5ebfc17c126c"
+    ".schem": "4e04b5a699dbeb8d1cec1b8f250f3327891eed1ed68ab98fb0cfe7a804c30abb",
+    ".litematic": "bbbdbd9f68176ef79de1458f225c57659e740c5732f423cc6d6e77b0f4da3703"
   }
 }

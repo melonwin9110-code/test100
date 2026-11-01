@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gentle, height-preserving edit of the bundled user schematic. Standard library only."""
+"""Height-preserving edit; basalt reduced threefold, with cobblestone/mossy cobblestone. Standard library only."""
 import argparse,collections,gzip,hashlib,json,math,struct
 from pathlib import Path
 
@@ -110,6 +110,31 @@ def run(source,dest):
     for x,y,z in floor_repairs:
         assert get(x,y,z)==0; put(x,y,z,1)
 
+    # Material-only revision: retain one third of the previous edition's basalt.
+    # The two newly requested block types intentionally extend the former palette.
+    before_basalt_change=blocks[:]
+    basalt_positions=[i for i,b in enumerate(blocks) if b==5]
+    basalt_before=len(basalt_positions)
+    keep_basalt=(basalt_before+1)//3
+    cobble_id=len(palette); palette.append('minecraft:cobblestone')
+    mossy_id=len(palette); palette.append('minecraft:mossy_cobblestone')
+    def coords(i): return i%W,i//(W*D),(i//W)%D
+    def basalt_field(i):
+        x,y,z=coords(i)
+        return .55*math.sin(x*.4+y*.21+z*.13)+.32*math.cos(z*.37-y*.29)+.12*hashed(x,y,z)
+    # Broad irregular patches instead of a checkerboard or abrupt uniform layer.
+    replacement=sorted(basalt_positions,key=lambda i:(basalt_field(i),i))[:basalt_before-keep_basalt]
+    def moss_field(i):
+        x,y,z=coords(i)
+        near_moss=sum(get(x+dx,y+dy,z+dz)==2 for dx,dy,dz in [(1,0,0),(-1,0,0),(0,1,0),(0,-1,0),(0,0,1),(0,0,-1)])
+        return .6*near_moss+.5*math.cos(x*.35-z*.2)+.3*math.sin(y*.55+z*.31)-.01*y+.1*hashed(x,y,z)
+    mossy_count=len(replacement)//2
+    mossy_positions=set(sorted(replacement,key=lambda i:(moss_field(i),i),reverse=True)[:mossy_count])
+    for i in replacement: blocks[i]=mossy_id if i in mossy_positions else cobble_id
+    assert sum(b==5 for b in blocks)==keep_basalt
+    assert all(a==b or a==5 and b in (cobble_id,mossy_id) for a,b in zip(before_basalt_change,blocks))
+    assert all(bool(a)==bool(b) for a,b in zip(before_basalt_change,blocks))
+
     # Preserve the entire existing occupied geometry and both original topmost blocks.
     assert all(not old or new for old,new in zip(original,blocks))
     assert get(25,33,18)==get(30,33,18)==2
@@ -137,7 +162,7 @@ def run(source,dest):
            'Offset':(11,s['Offset']),'PaletteMax':(3,len(palette)),
            'Palette':(10,{name:(3,i) for i,name in enumerate(palette)}),
            'BlockData':(7,blocks),'BlockEntities':(9,(10,[])),'Entities':(9,(10,[])),
-           'Metadata':(10,{'Name':(8,'Ancient Ruins - Gentle Edit, original height')})}
+           'Metadata':(10,{'Name':(8,'Ancient Ruins - Reduced Basalt, original height')})}
     save(dest/(stem+'.schem'),schem,'Schematic')
     bits=max(2,(len(palette)-1).bit_length()); states=[0]*math.ceil(len(blocks)*bits/64)
     for i,b in enumerate(blocks):
@@ -154,8 +179,8 @@ def run(source,dest):
             'BlockStatePalette':(9,(10,state_palette)),'BlockStates':(12,states),
             'Entities':(9,(10,[])),'TileEntities':(9,(10,[])),
             'PendingBlockTicks':(9,(10,[])),'PendingFluidTicks':(9,(10,[]))}
-    meta={'Name':(8,'Ancient Ruins - Gentle Edit'),'Author':(8,'Uploaded build; local edits'),
-          'Description':(8,'Original height and structure preserved; permitted materials, small moss patches and supported debris.'),
+    meta={'Name':(8,'Ancient Ruins - Reduced Basalt'),'Author':(8,'Uploaded build; local edits'),
+          'Description':(8,'Original height preserved; one third basalt, replaced remainder with cobblestone and mossy cobblestone.'),
           'RegionCount':(3,1),'TimeCreated':(4,1793577600000),'TimeModified':(4,1793577600000),
           'TotalBlocks':(3,nonair),'TotalVolume':(3,len(blocks)),'EnclosingSize':(10,vec(W,H,D))}
     save(dest/(stem+'.litematic'),{'Version':(3,6),'SubVersion':(3,1),'MinecraftDataVersion':(3,4671),
@@ -175,7 +200,10 @@ def run(source,dest):
             'palette_counts':{name:counts[i] for i,name in enumerate(palette)},
             'changes':{'cobblestone_to_stone':sum(oldnames[q]=='minecraft:cobblestone' for q in original),
                        'warped_stem_to_hyphae':sum(oldnames[q].startswith('minecraft:warped_stem') for q in original),
-                       'new_moss_on_existing_masonry':moss_changes,'added_rubble':rubble,'floor_holes_repaired':floor_repairs},
+                       'new_moss_on_existing_masonry':moss_changes,'added_rubble':rubble,'floor_holes_repaired':floor_repairs,
+                       'basalt_replacement':{'baseline_basalt':basalt_before,'remaining_basalt':keep_basalt,
+                                            'added_cobblestone':len(replacement)-mossy_count,'added_mossy_cobblestone':mossy_count,
+                                            'geometry_unchanged_from_previous_edit':True,'other_block_states_unchanged':True}},
             'validation':{'same_selection_dimensions':True,'same_occupied_bounds':True,'same_topmost_blocks':True,
                           'all_original_occupied_positions_retained':True,'blocks_removed_or_moved':0,
                           'full_block_roundtrip_both_formats':True,'route_width':5,'route_clearance':2,'route_length':36,
