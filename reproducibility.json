@@ -1,0 +1,10 @@
+[
+  {
+    "generator": "generate_ruins.py",
+    "reproduction_byte_identical": true
+  },
+  {
+    "generator": "generate_compact.py",
+    "reproduction_byte_identical": true
+  }
+]

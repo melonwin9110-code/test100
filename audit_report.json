@@ -1,0 +1,66 @@
+{
+  "large": {
+    "size": [
+      129,
+      88,
+      129
+    ],
+    "non_air_blocks": 212497,
+    "counts": {
+      "minecraft:air": 1251911,
+      "minecraft:smooth_basalt": 97804,
+      "minecraft:stone": 75592,
+      "minecraft:calcite": 379,
+      "minecraft:warped_hyphae": 26032,
+      "minecraft:moss_block": 12690
+    },
+    "highest_occupied_y": 79,
+    "clear_route_width": 7,
+    "clear_route_height": 4,
+    "clear_route_length": 94,
+    "all_checks_passed": true,
+    "in_game_tested": false,
+    "sha256": {
+      "overgrown_sanctuary.litematic": "a555e60e2eb1ae9f3e2eb69614253c6781125b0a21c8262c29bfbe327c7ab0fb",
+      "overgrown_sanctuary.schem": "1adf69ff078ce1fddb3165034f52035c6e2e9eea59371df1a886d08ebfb67240"
+    }
+  },
+  "compact": {
+    "size": [
+      60,
+      88,
+      60
+    ],
+    "non_air_blocks": 46027,
+    "counts": {
+      "minecraft:air": 270773,
+      "minecraft:smooth_basalt": 21005,
+      "minecraft:stone": 16496,
+      "minecraft:calcite": 83,
+      "minecraft:warped_hyphae": 5744,
+      "minecraft:moss_block": 2699
+    },
+    "highest_occupied_y": 79,
+    "clear_route_width": 5,
+    "clear_route_height": 4,
+    "clear_route_length": 47,
+    "all_checks_passed": true,
+    "in_game_tested": false,
+    "sha256": {
+      "overgrown_sanctuary_60x88x60.litematic": "7cac2da0d33b4a6db08d4d83f667ed042e0ae949ecc6c698652fcb1dc0bcd454",
+      "overgrown_sanctuary_60x88x60.schem": "796f7ae67034fac2d033cbd38e2b90abd85609e0b059f92c2f73d483dff52c72"
+    }
+  },
+  "checks": [
+    "gzip CRC and NBT complete parsing",
+    "Litematica v6 header and required tags",
+    "independent packed-state decoding",
+    "Sponge v2 header and VarInt block decoding",
+    "all blocks identical across formats",
+    "strict six-entry palette",
+    "metadata counts",
+    "full corridor width and 4-block headroom",
+    "single-block stairs and adjacent-step player headroom"
+  ],
+  "data_version_note": "Both files declare 4671 (Java 1.21.11). No running Minecraft client available."
+}

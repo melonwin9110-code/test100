@@ -1,0 +1,28 @@
+{
+  "dimensions": {
+    "x": 129,
+    "y": 88,
+    "z": 129
+  },
+  "minecraft_data_version": 4671,
+  "non_air_blocks": 212497,
+  "palette_counts": {
+    "minecraft:air": 1251911,
+    "minecraft:smooth_basalt": 97804,
+    "minecraft:stone": 75592,
+    "minecraft:calcite": 379,
+    "minecraft:warped_hyphae": 26032,
+    "minecraft:moss_block": 12690
+  },
+  "validation": {
+    "gzip_nbt_roundtrip": true,
+    "litematica_all_packed_states_match": true,
+    "worldedit_all_blocks_match": true,
+    "entrance_route_width": 7,
+    "entrance_route_clearance": 4,
+    "entrance_route_length": 94,
+    "max_route_step": 1,
+    "in_game_tested": false
+  },
+  "orientation": "Front is +Z; left slope is -X. Region minimum corner is (0,0,0)."
+}
