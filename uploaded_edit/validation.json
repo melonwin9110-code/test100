@@ -42,10 +42,9 @@
     "minecraft:moss_block": 377,
     "minecraft:warped_hyphae[axis=y]": 36,
     "minecraft:calcite": 59,
-    "minecraft:smooth_basalt": 941,
     "minecraft:warped_hyphae[axis=x]": 24,
-    "minecraft:cobblestone": 941,
-    "minecraft:mossy_cobblestone": 940
+    "minecraft:cobblestone": 1411,
+    "minecraft:mossy_cobblestone": 1411
   },
   "changes": {
     "cobblestone_to_stone": 2104,
@@ -563,9 +562,13 @@
     ],
     "basalt_replacement": {
       "baseline_basalt": 2822,
-      "remaining_basalt": 941,
-      "added_cobblestone": 941,
-      "added_mossy_cobblestone": 940,
+      "remaining_basalt": 0,
+      "added_cobblestone": 1411,
+      "added_mossy_cobblestone": 1411,
+      "replaced_in_latest_revision": 941,
+      "latest_added_cobblestone": 470,
+      "latest_added_mossy_cobblestone": 471,
+      "basalt_absent_from_palette": true,
       "geometry_unchanged_from_previous_edit": true,
       "other_block_states_unchanged": true
     }
@@ -584,7 +587,7 @@
     "in_game_tested": false
   },
   "sha256": {
-    ".schem": "4e04b5a699dbeb8d1cec1b8f250f3327891eed1ed68ab98fb0cfe7a804c30abb",
-    ".litematic": "bbbdbd9f68176ef79de1458f225c57659e740c5732f423cc6d6e77b0f4da3703"
+    ".schem": "7847860d7e051661e134e1a498e98c2e182b8df4bdd9ac33175c11a034767ec9",
+    ".litematic": "c526a18a86799ad61e2060c8346b6fe199b2b2682048ea787d36e20d195fa264"
   }
 }

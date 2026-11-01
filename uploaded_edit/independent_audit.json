@@ -18,16 +18,19 @@
       50
     ]
   ],
-  "baseline_smooth_basalt": 2822,
-  "remaining_smooth_basalt": 941,
-  "replaced_by_cobblestone": 941,
-  "replaced_by_mossy_cobblestone": 940,
-  "changed_positions": 1881,
+  "baseline_smooth_basalt": 941,
+  "remaining_smooth_basalt": 0,
+  "replaced_by_cobblestone": 470,
+  "replaced_by_mossy_cobblestone": 471,
+  "total_cobblestone": 1411,
+  "total_mossy_cobblestone": 1411,
+  "basalt_absent_from_palette": true,
+  "changed_positions": 941,
   "all_non_basalt_states_exactly_preserved": true,
   "entire_occupancy_exactly_preserved": true,
   "top_layer_exactly_preserved": true,
-  "state_palette_count": 9,
-  "litematica_bits_per_block": 4,
+  "state_palette_count": 8,
+  "litematica_bits_per_block": 3,
   "non_air_blocks": 7185,
   "route": {
     "width": 5,
@@ -40,9 +43,9 @@
   "litemapy_0_11_0b0_and_nbtlib_2_0_4_all_states_equal": 95370,
   "clean_temp_reproduction_identical": true,
   "in_game_tested": false,
-  "baseline_schem_sha256": "8ceef751fa095ce5a393ccbbf2cd799387052f1b011e97e92edc7e05ff547a66",
+  "baseline_schem_sha256": "4e04b5a699dbeb8d1cec1b8f250f3327891eed1ed68ab98fb0cfe7a804c30abb",
   "sha256": {
-    "ancient_ruins_warped_edited.schem": "4e04b5a699dbeb8d1cec1b8f250f3327891eed1ed68ab98fb0cfe7a804c30abb",
-    "ancient_ruins_warped_edited.litematic": "bbbdbd9f68176ef79de1458f225c57659e740c5732f423cc6d6e77b0f4da3703"
+    "ancient_ruins_warped_edited.schem": "7847860d7e051661e134e1a498e98c2e182b8df4bdd9ac33175c11a034767ec9",
+    "ancient_ruins_warped_edited.litematic": "c526a18a86799ad61e2060c8346b6fe199b2b2682048ea787d36e20d195fa264"
   }
 }
